@@ -6,7 +6,7 @@ function Bprime = BoostedSparseShrink(obj,Aprime,l,dirac)
 %     nmax = 10;
 %     while (true && n < nmax)
     while (true)
-        Bprime = SparseShrink(Aprime,l);
+        Bprime = SparseShrink(obj,Aprime,l);
         alpha = 6/41; % black magic
         delta = ( norm(Aprime,'Fro')^2 - norm(Bprime,'Fro')^2 ) / (alpha * l);
         C = (Aprime'*Aprime - Bprime' * Bprime) / (delta/2);
@@ -17,7 +17,7 @@ function Bprime = BoostedSparseShrink(obj,Aprime,l,dirac)
     end
 end
 
-function Bprime = SparseShrink(Aprime,l)
+function Bprime = SparseShrink(obj,Aprime,l)
     [m,d] = size(Aprime);
     assert(l<=m, "l must be leq m");
 

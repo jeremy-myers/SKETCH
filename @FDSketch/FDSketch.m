@@ -1,7 +1,7 @@
 classdef FDSketch < matlab.mixin.SetGet
     properties
         B;
-        S; 
+        S;
         V;
         dirac;
         i;
@@ -11,31 +11,21 @@ classdef FDSketch < matlab.mixin.SetGet
         l;
         flag;
     end
-    
     methods
         function obj = FDSketch(varargin)
-            n = varargin{1};
-            d = varargin{2};
-%             k = varargin{3};
-            l = varargin{3};
-            if (nargin < 4)
-                flag = false;
-            else
-                flag = varargin{4};
+            obj.n = varargin{1};
+            obj.d = varargin{2};
+            obj.l = varargin{3};
+            obj.flag = false;
+            if (nargin == 4)
+                obj.flag = varargin{4};
             end
-
-            obj.B = zeros(l,d);
-            obj.S = zeros(l,l);
-            obj.V = zeros(d,l);
+            obj.B = zeros(obj.l,obj.d);
+            obj.S = zeros(obj.l,obj.l);
+            obj.V = zeros(obj.d,obj.l);
             obj.dirac = 0.90;
             obj.i = 0;
-            obj.n = n;
-            obj.d = d;
-%             obj.k = k;
-            obj.l = l;
-            obj.flag = flag;
         end
-        
         LinearUpdate(obj,varargin);
         bool = VerifySpectral(obj,varargin);
         [S,V] = LowRankApprox(obj,varargin);
