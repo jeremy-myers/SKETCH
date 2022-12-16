@@ -37,6 +37,7 @@
 
 if strcmp(field,'real')
     alpha = 1;
+    A = real(A);
 elseif strcmp(field,'complex')
     alpha = 0;
 else
@@ -62,6 +63,7 @@ Tdivdim = unique([TdivdimMin,Tdivdim]);
 T = Tdivdim*(m+n);
 
 Err_S1 = (n <= 3e3);
+Err_S2_trace = [];
 
 %% Preallocation
 sd.hmtsketch.l = [];
@@ -89,11 +91,15 @@ for Iter = 1:numel(Tdivdim)
     sd.threesketch.ErrThree_S1{Iter} = [];
     sd.threesketch.ErrThree_S2{Iter} = [];
     sd.threesketch.ErrThree_Sinf{Iter} = [];
+    sd.fd3sketch.ErrFD3_S2{Iter} = [];
+    sd.fd3sketch.ErrFDh_S2{Iter} = [];
+    sd.fd3sketch.ErrFDs_S2{Iter} = [];
     
     %% Sweep parameters
     k2S = r+alpha+1;
     l2S = floor((T(Iter) - k2S*m)/n);
-        
+    
+    %{
     while (r+alpha+1 <= k2S) && (k2S+alpha+1 <= l2S)
         
         %% Generate sketch
@@ -134,7 +140,7 @@ for Iter = 1:numel(Tdivdim)
         sd.twosketch.ErrA7_S2{Iter} = nan;
         sd.twosketch.ErrA7_Sinf{Iter} = nan;
     end
-    
+    %}
     
     %% Three-sketch
     k3S = r+alpha+1;
@@ -143,9 +149,11 @@ for Iter = 1:numel(Tdivdim)
         s3S = 0;
     end
     
+    seed = 1;
     while (r+alpha+1 <= k3S) && (k3S+alpha <= s3S)
         
         %% Create the optimal sketch
+        rng(seed);
         myThreeSketch = ThreeSketch(model, m, n, k3S, s3S, field);
         myThreeSketch.LinearUpdate(A);
         
@@ -160,7 +168,19 @@ for Iter = 1:numel(Tdivdim)
             ErrThree_S1    = nan;
             ErrThree_Sinf  = svds(AThree - A,1);
         end
-        
+
+        %% Create FD-optimal sketch hybrid
+        rng(seed);
+        FD3Sketch = RowIterator(A,model,r,k3S,s3S,m,field);
+        AFD3 = FD3Sketch.SketchThree.FixedRankApprox(r);
+        AFDh = FD3Sketch.SketchFD_Uh * (FD3Sketch.SketchFD_Sh * FD3Sketch.SketchFD_Vh');
+        AFDs = FD3Sketch.SketchFD_Us * (FD3Sketch.SketchFD_Ss * FD3Sketch.SketchFD_Vs');
+        ErrFD3_S2 = norm(AFD3 - A,'fro');
+        ErrFDh_S2 = norm(AFDh - A,'fro'); 
+        ErrFDs_S2 = norm(AFDs - A,'fro'); 
+
+        seed = seed + 1;
+
         %% Updahyay's Single-View Fixed-Rank Approximation
         AUpa = myThreeSketch.UpaFixedRankApprox(r);
         ErrUpa_S2  = norm(AUpa - A,'fro');
@@ -175,9 +195,13 @@ for Iter = 1:numel(Tdivdim)
         
         %% Compute the errors
         % Find (A - Aour) using thinSVD
-        fprintf('T/(m+n) = %d, k = %d, s = %d, ThreeRelErr = %f, UpaRelErr = %f ... \n', ...
-            Tdivdim(Iter), k3S, s3S, ErrThree_S2./ErrBest_S2-1, ErrUpa_S2./ErrBest_S2-1 );
+%         fprintf('T/(m+n) = %d, k = %d, s = %d, ThreeRelErr = %f, UpaRelErr = %f, FDRelErr = %f, ThreeFDRelErr = %f ... \n', ...
+%             Tdivdim(Iter), k3S, s3S, ErrThree_S2./ErrBest_S2-1, ErrUpa_S2./ErrBest_S2-1, ErrFD_S2./ErrBest_S2-1, ErrThreeFD_S2./ErrBest_S2-1 );      
         
+        fprintf('T/(m+n) = %d, k = %d, s = %d, ThreeRelErr = %f, UpaRelErr = %f, FDhRelErr = %f, FDsRelErr = %f, FD3RelErr = %f ... \n', ...
+            Tdivdim(Iter), k3S, s3S, ErrThree_S2, ErrUpa_S2, ErrFDh_S2, ErrFDs_S2, ErrFD3_S2 );
+        
+
         %% Save data
         sd.threesketch.k{Iter}(end+1) = k3S;
         sd.threesketch.s{Iter}(end+1) = s3S;
@@ -187,6 +211,9 @@ for Iter = 1:numel(Tdivdim)
         sd.threesketch.ErrThree_S1{Iter}(end+1) = ErrThree_S1;
         sd.threesketch.ErrThree_S2{Iter}(end+1) = ErrThree_S2;
         sd.threesketch.ErrThree_Sinf{Iter}(end+1) = ErrThree_Sinf;
+        sd.fd3sketch.ErrFD3_S2{Iter}(end+1) = ErrFD3_S2;
+        sd.fd3sketch.ErrFDh_S2{Iter}(end+1) = ErrFDh_S2;
+        sd.fd3sketch.ErrFDs_S2{Iter}(end+1) = ErrFDs_S2;
         
         %% increase k, decrease s, keep T ~constant
         k3S = k3S + 1;
@@ -204,9 +231,13 @@ for Iter = 1:numel(Tdivdim)
         sd.threesketch.ErrThree_S1{Iter} = nan;
         sd.threesketch.ErrThree_S2{Iter} = nan;
         sd.threesketch.ErrThree_Sinf{Iter} = nan;
+        sd.fd3sketch.ErrFD3_S2{Iter} = nan;
+        sd.fd3sketch.ErrFDh_S2{Iter} = nan;
+        sd.fd3sketch.ErrFDs_S2{Iter} = nan;
     end
     
     %% HMT-Sketch
+    %{
     lrS = round(Tdivdim(Iter));
     sd.hmtsketch.l(end+1) = lrS;
         
@@ -214,7 +245,7 @@ for Iter = 1:numel(Tdivdim)
     myHmtSketch = HMTSketch(model, m, n, lrS, field);
     myHmtSketch.LinearUpdate(A);
     
-    %% HMT Fixed-Rank Approximation
+    %% HMT Fixed-Rank Approximation    
     AHMT = myHmtSketch.HMTFixedRankApprox(r);
     ErrHMT_S2  = norm(AHMT - A,'fro');
     if Err_S1
@@ -224,12 +255,12 @@ for Iter = 1:numel(Tdivdim)
     else
         ErrHMT_S1    = nan;
         ErrHMT_Sinf  = svds(AHMT - A,1);
-    end
+    end    
     
     %% Save data
     sd.hmtsketch.ErrHMT_S1(end+1) = ErrHMT_S1;
     sd.hmtsketch.ErrHMT_S2(end+1) = ErrHMT_S2;
-    sd.hmtsketch.ErrHMT_Sinf(end+1) = ErrHMT_Sinf;
+    sd.hmtsketch.ErrHMT_Sinf(end+1) = ErrHMT_Sinf;    
     
     %% WLRT-Sketch
     sd.wlrtsketch.l(end+1) = lrS;
@@ -258,7 +289,7 @@ for Iter = 1:numel(Tdivdim)
     %% Print intermediate results
     fprintf('T/(m+n) = %d, l = %d, WlrtRelErr = %f, HmtRelErr = %f   ... \n', ...
         Tdivdim(Iter), lrS, ErrWLRT_S2./ErrBest_S2-1, ErrHMT_S2./ErrBest_S2-1 );
-    
+    %}
 end
 
 %% Variables to be saved

@@ -26,7 +26,7 @@ clearvars
 xi = [1e-4, 1e-2, 1e-1];
 sname = {'LowNoise','MedNoise','HiNoise'};
 
-n = 1000;
+n = 4000;
 
 Rsweep = [5,10,20];
 
