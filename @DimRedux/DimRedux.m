@@ -1,4 +1,4 @@
-classdef DimRedux
+classdef DimRedux < matlab.mixin.SetGet
     %DIMREDUX implements a class definition for the dimensionality  
     %reduction maps described in [TYUC2019]. See our paper and its
     %supplementary materials for more details. 
@@ -42,7 +42,11 @@ classdef DimRedux
         function x = mtimes(obj1,obj2)
             if isa(obj1,'DimRedux') && isa(obj2,'double')
                 if ~obj1.transposeFlag
-                    x = LeftApply(obj1,obj2);
+                    if isempty(obj1.subview)
+                        x = LeftApply(obj1,obj2);
+                    else
+                        x = LeftApplySubview(obj1,obj2);
+                    end
                 else
                     x = RightApply(obj1',obj2')';
                 end
@@ -50,7 +54,11 @@ classdef DimRedux
                 if ~obj2.transposeFlag
                     x = RightApply(obj2,obj1);
                 else
-                    x = LeftApply(obj2',obj1')';
+%                     if isempty(obj2.subview)
+                        x = LeftApply(obj2',obj1')';
+%                     else
+%                         x = LeftApplySubview(obj2',obj1');
+%                     end
                 end
             else
                 error(['Multiplication is defined only between', ...
@@ -123,6 +131,7 @@ classdef DimRedux
         function ln = length(obj)
             ln = obj.n; % k cannot be larger than n ==> max(size(obj)) = n
         end
+        
     end
 end
 

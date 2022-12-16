@@ -79,7 +79,8 @@ classdef ThreeSketch < matlab.mixin.SetGet
         end
         
         % Other methods
-        LinearUpdate(obj, varargin)  
+        LinearUpdate(obj, varargin)
+        LinearUpdateRow(obj, varargin)
         [Q, W, P] = LowRankApprox(obj)          
         [U, S, V] = FixedRankApprox(obj, r)        
         [U, S, V] = UpaFixedRankApprox(obj, r)
@@ -109,7 +110,7 @@ classdef ThreeSketch < matlab.mixin.SetGet
             else
                 error('Size of input does not match with sketch size.')
             end
-        end
+        end     
         
         %% Methods about storage
         function nz = nnzTestMatrix(obj)

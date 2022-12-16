@@ -24,6 +24,10 @@ classdef Sparse < DimRedux
         field
         Xi
     end
+
+    properties (Access = public)
+        subview
+    end
     
     %% methods
     methods
@@ -75,6 +79,18 @@ classdef Sparse < DimRedux
         function x = RightApply(obj,A)
             x = mtimes(A,obj.Xi);
         end
+
+        function x = LeftApplySubview(obj,A)
+            x = mtimes(obj.Xi(:,obj.subview),A);
+        end
+
+        function obj = set.subview(obj,subview_idx)
+            obj.subview = subview_idx;
+        end
+
+        function subview = get.subview(obj)
+            subview = obj.subview;
+        end
         
         %% Overloaded methods
         
@@ -96,7 +112,7 @@ classdef Sparse < DimRedux
             else
                 disp(obj.Xi');
             end
-        end
+        end        
     end
 end
 
