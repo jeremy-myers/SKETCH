@@ -45,7 +45,6 @@ narginchk(2,5);
 
 m = size(obj.Y,1); %#ok
 n = size(obj.X,2);
-
 if nargin == 2
     H = varargin{1};
     eta = 0;

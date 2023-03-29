@@ -63,10 +63,10 @@ classdef ThreeSketch < matlab.mixin.SetGet
                 end
             end
                     
-            obj.Upsilon = feval(Model,k,m,field);
-            obj.Omega = feval(Model,k,n,field);
-            obj.Phi = feval(Model,s,m,field);
-            obj.Psi = feval(Model,s,n,field);
+            obj.Upsilon = feval(Model,k,m,field,0);
+            obj.Omega = feval(Model,k,n,field,1);
+            obj.Phi = feval(Model,s,m,field,2);
+            obj.Psi = feval(Model,s,n,field,3);
             
             obj.X = zeros(k,n);
             obj.Y = zeros(m,k);

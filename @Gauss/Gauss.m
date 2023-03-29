@@ -35,6 +35,7 @@ classdef Gauss < DimRedux
             else
                 obj.field = 'real';
             end
+            rng(varargin{end},'twister');
             if strcmp(obj.field,'real')
                 obj.Xi = randn(k,n);
             elseif strcmp(obj.field,'complex')

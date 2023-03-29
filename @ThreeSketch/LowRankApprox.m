@@ -32,8 +32,8 @@ function [ Q, W, P ] = LowRankApprox( obj )
 % (LIONS), Ecole Polytechnique Federale de Lausanne, Switzerland.
 % This code is a part of SKETCH toolbox. 
 % Please read COPYRIGHT before using this file.
-if ~isempty(obj.Phi.subview), obj.Phi.subview = []; end
-if ~isempty(obj.Psi.subview), obj.Psi.subview = []; end
+% if ~isempty(obj.Phi.subview), obj.Phi.subview = []; end
+% if ~isempty(obj.Psi.subview), obj.Psi.subview = []; end
 [Q, ~] = qr(obj.Y,0);
 [P, ~] = qr(obj.X',0);
 [U1,T1] = qr(obj.Phi*Q,0);

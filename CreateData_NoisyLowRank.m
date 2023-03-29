@@ -26,7 +26,7 @@ clearvars
 xi = [1e-4, 1e-2, 1e-1];
 sname = {'LowNoise','MedNoise','HiNoise'};
 
-n = 4000;
+n = 1000;
 
 Rsweep = [5,10,20];
 
@@ -36,7 +36,8 @@ for R = Rsweep
         % Generate the matrix A
         A = zeros(n,n);
         A(1:R,1:R) = diag(ones(R,1));
-        G = (randn(n,n) + 1i*randn(n,n));
+%         G = (randn(n,n) + 1i*randn(n,n));
+        G = randn(n,n);
         W = G*G';
         clearvars G;
         A = A + xi(t)/n.*W;

@@ -94,6 +94,7 @@ for Iter = 1:numel(Tdivdim)
     sd.fd3sketch.ErrFD3_S2{Iter} = [];
     sd.fd3sketch.ErrFDh_S2{Iter} = [];
     sd.fd3sketch.ErrFDs_S2{Iter} = [];
+    sd.fd3sketch.ErrFDpar_S2{Iter} = [];
     
     %% Sweep parameters
     k2S = r+alpha+1;
@@ -171,13 +172,15 @@ for Iter = 1:numel(Tdivdim)
 
         %% Create FD-optimal sketch hybrid
         rng(seed);
-        FD3Sketch = RowIterator(A,model,r,k3S,s3S,m,field);
+        FD3Sketch = RowIterator(A,model,r,k3S,s3S,m/10,field);
         AFD3 = FD3Sketch.SketchThree.FixedRankApprox(r);
         AFDh = FD3Sketch.SketchFD_Uh * (FD3Sketch.SketchFD_Sh * FD3Sketch.SketchFD_Vh');
         AFDs = FD3Sketch.SketchFD_Us * (FD3Sketch.SketchFD_Ss * FD3Sketch.SketchFD_Vs');
+        AFDpar = FD3Sketch.SketchFD_Upar * (FD3Sketch.SketchFD_Spar * FD3Sketch.SketchFD_Vpar');
         ErrFD3_S2 = norm(AFD3 - A,'fro');
-        ErrFDh_S2 = norm(AFDh - A,'fro'); 
-        ErrFDs_S2 = norm(AFDs - A,'fro'); 
+        ErrFDh_S2 = norm(AFDh - A,'fro');
+        ErrFDs_S2 = norm(AFDs - A,'fro');
+        ErrFDpar_S2 = norm(AFDpar - A,'fro');
 
         seed = seed + 1;
 
@@ -198,8 +201,8 @@ for Iter = 1:numel(Tdivdim)
 %         fprintf('T/(m+n) = %d, k = %d, s = %d, ThreeRelErr = %f, UpaRelErr = %f, FDRelErr = %f, ThreeFDRelErr = %f ... \n', ...
 %             Tdivdim(Iter), k3S, s3S, ErrThree_S2./ErrBest_S2-1, ErrUpa_S2./ErrBest_S2-1, ErrFD_S2./ErrBest_S2-1, ErrThreeFD_S2./ErrBest_S2-1 );      
         
-        fprintf('T/(m+n) = %d, k = %d, s = %d, ThreeRelErr = %f, UpaRelErr = %f, FDhRelErr = %f, FDsRelErr = %f, FD3RelErr = %f ... \n', ...
-            Tdivdim(Iter), k3S, s3S, ErrThree_S2, ErrUpa_S2, ErrFDh_S2, ErrFDs_S2, ErrFD3_S2 );
+        fprintf('T/(m+n) = %d, k = %d, s = %d, ThreeRelErr = %f, UpaRelErr = %f, FDhRelErr = %f, FDsRelErr = %f, FD3RelErr = %f, FDparRelErr = %f ... \n', ...
+            Tdivdim(Iter), k3S, s3S, ErrThree_S2, ErrUpa_S2, ErrFDh_S2, ErrFDs_S2, ErrFD3_S2, ErrFDpar_S2 );
         
 
         %% Save data
@@ -214,6 +217,7 @@ for Iter = 1:numel(Tdivdim)
         sd.fd3sketch.ErrFD3_S2{Iter}(end+1) = ErrFD3_S2;
         sd.fd3sketch.ErrFDh_S2{Iter}(end+1) = ErrFDh_S2;
         sd.fd3sketch.ErrFDs_S2{Iter}(end+1) = ErrFDs_S2;
+        sd.fd3sketch.ErrFDpar_S2{Iter}(end+1) = ErrFDpar_S2;
         
         %% increase k, decrease s, keep T ~constant
         k3S = k3S + 1;

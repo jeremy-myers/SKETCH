@@ -27,9 +27,9 @@ classdef SSRFT < DimRedux
         coords
     end
 
-    properties (Access = public)
-        subview
-    end
+%     properties (Access = public)
+%         subview
+%     end
     
     %% methods
     methods
@@ -53,12 +53,12 @@ classdef SSRFT < DimRedux
             else
                 err('Input ''field'' should be ''real'' or ''complex''.')
             end
-            obj.subview = [];
+%             obj.subview = [];
         end
         
         %% Other methods
         function B = LeftApply(obj,M)
-            if isempty(obj.subview)
+%             if isempty(obj.subview)
                 B = obj.Pi1*M;
                 if isreal(obj)
                     B = dct(B);
@@ -72,22 +72,22 @@ classdef SSRFT < DimRedux
                     B = fft(B);
                 end
                 B = B(obj.coords,:);
-            else              
-                idx = obj.subview;
-                B = obj.Pi1(:,idx)*M;
-                if isreal(obj)
-                    B = dct(B);
-                else
-                    B = fft(B);
-                end
-                B = obj.Pi2(:,idx)*B;
-                if isreal(obj)
-                    B = dct(B);
-                else
-                    B = fft(B);
-                end
-                B = B(obj.coords,:);
-            end
+%             else              
+%                 idx = obj.subview;
+%                 B = obj.Pi1(:,idx)*M;
+%                 if isreal(obj)
+%                     B = dct(B);
+%                 else
+%                     B = fft(B);
+%                 end
+%                 B = obj.Pi2(:,idx)*B;
+%                 if isreal(obj)
+%                     B = dct(B);
+%                 else
+%                     B = fft(B);
+%                 end
+%                 B = B(obj.coords,:);
+%             end
         end
         
         function B = RightApply(obj,M)
@@ -108,13 +108,13 @@ classdef SSRFT < DimRedux
             B = B*obj.Pi1;
         end
 
-        function obj = set.subview(obj,subview_idx)
-            obj.subview = subview_idx;
-        end
-
-        function subview = get.subview(obj)
-            subview = obj.subview;
-        end
+%         function obj = set.subview(obj,subview_idx)
+%             obj.subview = subview_idx;
+%         end
+% 
+%         function subview = get.subview(obj)
+%             subview = obj.subview;
+%         end
         
         %% Overloaded methods
         

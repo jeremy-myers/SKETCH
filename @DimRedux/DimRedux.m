@@ -30,9 +30,9 @@ classdef DimRedux < matlab.mixin.SetGet
     methods
         % Constructor
         function obj = DimRedux(k, n) 
-            if k > n
-                error('k should be less than or equal to n.')
-            end
+%             if k > n
+%                 error('k should be less than or equal to n.')
+%             end
             obj.k = k;
             obj.n = n;
             obj.transposeFlag = 0;
@@ -41,12 +41,8 @@ classdef DimRedux < matlab.mixin.SetGet
         %% Mtimes
         function x = mtimes(obj1,obj2)
             if isa(obj1,'DimRedux') && isa(obj2,'double')
-                if ~obj1.transposeFlag
-                    if isempty(obj1.subview)
-                        x = LeftApply(obj1,obj2);
-                    else
-                        x = LeftApplySubview(obj1,obj2);
-                    end
+                if ~obj1.transposeFlag                    
+                    x = LeftApply(obj1,obj2);                                                         
                 else
                     x = RightApply(obj1',obj2')';
                 end
@@ -54,11 +50,7 @@ classdef DimRedux < matlab.mixin.SetGet
                 if ~obj2.transposeFlag
                     x = RightApply(obj2,obj1);
                 else
-%                     if isempty(obj2.subview)
-                        x = LeftApply(obj2',obj1')';
-%                     else
-%                         x = LeftApplySubview(obj2',obj1');
-%                     end
+                    x = LeftApply(obj2',obj1')';
                 end
             else
                 error(['Multiplication is defined only between', ...
