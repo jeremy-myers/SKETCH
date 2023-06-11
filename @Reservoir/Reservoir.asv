@@ -1,0 +1,29 @@
+classdef Reservoir < Sample
+  %RESERVOIR Summary of this class goes here
+  %   Detailed explanation goes here
+  
+  properties
+    Xi
+    sample_inds
+    sz_reservoir
+    count
+    initialized
+  end
+  
+  methods
+    function obj = Reservoir(k, n, varargin)
+      %RESERVOIR Construct an instance of this class
+      %   Detailed explanation goes here
+%       obj@Sample(k,n);
+      obj.sample_inds = zeros(k,1);
+      obj.Xi = zeros(k,n);
+      obj.sz_reservoir = k;
+      obj.count = k+1;
+      obj.initialized = false;
+    end
+    
+    Update(obj, varargin);
+
+  end
+end
+

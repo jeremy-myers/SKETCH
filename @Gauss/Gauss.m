@@ -29,7 +29,7 @@ classdef Gauss < DimRedux
     methods
         % Constructor
         function obj = Gauss(k, n, varargin)
-			obj@DimRedux(k,n);
+			      obj@DimRedux(k,n);
             if length(varargin) >= 1
                 obj.field = lower(varargin{1});
             else
@@ -71,6 +71,14 @@ classdef Gauss < DimRedux
                 disp(obj.Xi);
             else
                 disp(obj.Xi');
+            end
+        end
+
+        function B = subsref(obj,S)
+            if (numel(S.subs) == 2)
+                B = obj.Xi(S.subs{1},S.subs{2});
+            else
+                error("Not implemented yet.");
             end
         end
     end
